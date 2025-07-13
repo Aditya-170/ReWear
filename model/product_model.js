@@ -11,7 +11,7 @@ const ProductSchema = new mongoose.Schema({
   condition: String,
   tags: String,
   images: [String],
-  status: { type: String, default: 'Available' },
+  status: { type: String,enum: ['Available',  'Sold'], default: 'Available' },
 
   createdAt: { type: Date, default: Date.now }
 

@@ -1,9 +1,9 @@
-// File: app/api/notifications/accept/route.js
-
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
-import notification_model from "@/model/notification_model";
-import swapItem_model from "@/model/swapItem_model";
+import Notification from "@/model/notification_model";
+import SwapItem from "@/model/swapItem_model";
+import Product from "@/model/product_model";
+import User from "@/model/user_model";
 
 export async function POST(req) {
   try {
@@ -14,16 +14,51 @@ export async function POST(req) {
       return NextResponse.json({ error: "Missing notificationId or swapId" }, { status: 400 });
     }
 
-    // Update Notification
-    await notification_model.findByIdAndUpdate(notificationId, {
-      isRead: true,
+    const swap = await SwapItem.findByIdAndUpdate(
+      swapId,
+      { status: "accepted" },
+      { new: true }
+    )
+      .populate("product1")
+      .populate("product2");
+
+    if (!swap) return NextResponse.json({ error: "Swap not found" }, { status: 404 });
+
+    // Update products as sold
+    await Product.findByIdAndUpdate(swap.product1._id, { status: "sold" });
+    await Product.findByIdAndUpdate(swap.product2._id, { status: "sold" });
+
+    // Update existing notification
+    await Notification.findByIdAndUpdate(notificationId, {
       status: "accepted",
+      isRead: true,
     });
 
-    // Update SwapItem
-    await swapItem_model.findByIdAndUpdate(swapId, {
-      status: "accepted",
-    });
+    // Notify second owner
+    const secondUser = await User.findOne({ clerkUserId: swap.owner1 });
+    if (secondUser) {
+      await Notification.create({
+        user: secondUser._id,
+        swap: swap._id,
+        message: `Your swap request for "${swap.product1.title}" has been accepted!`,
+        status: "accepted",
+      });
+    }
+
+    // ✅ Point Adjustment Logic
+    const p1Points = swap.product1.points;
+    const p2Points = swap.product2.points;
+    const pointDiff = Math.abs(p1Points - p2Points);
+
+    if (p1Points !== p2Points) {
+      const userToRewardClerkId = p1Points < p2Points ? swap.owner1 : swap.owner2;
+
+      const rewardUser = await User.findOne({ clerkUserId: userToRewardClerkId });
+      if (rewardUser) {
+        rewardUser.points += pointDiff;
+        await rewardUser.save();
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
