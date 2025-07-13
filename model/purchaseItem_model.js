@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const purchaseItemSchema = new mongoose.Schema(
   {
-    owner: {
+    buyer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -18,8 +18,7 @@ const purchaseItemSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "completed", "cancelled"],
-      default: "pending",
+      default: "Purchased",
     },
     purchaseDate: {
       type: Date,

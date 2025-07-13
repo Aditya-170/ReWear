@@ -17,6 +17,8 @@ export default function AdminPanel() {
   const [productsLoading, setProductsLoading] = useState(true);
   const [usersVisibleCount, setUsersVisibleCount] = useState(8);
   const [productsVisibleCount, setProductsVisibleCount] = useState(8);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
     // Fetch users
@@ -31,8 +33,13 @@ export default function AdminPanel() {
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .finally(() => setProductsLoading(false));
+    setOrdersLoading(true);
+    fetch("/api/all-puchases")
+      .then((res) => res.json())
+      .then((data) => setOrders(data))
+      .finally(() => setOrdersLoading(false));
   }, []);
-
+  console.log("products", products);
   return (
     <>
       <Navbar />
@@ -169,6 +176,58 @@ export default function AdminPanel() {
               )}
             </div>
           )}
+
+          {activeTab === "orders" && (
+            <div className="space-y-6">
+              {ordersLoading ? (
+                <div className="text-center py-12 text-purple-200 animate-pulse">Loading orders...</div>
+              ) : orders.length === 0 ? (
+                <div className="text-center py-12 text-purple-200">No orders found.</div>
+              ) : (
+                <>
+                  {orders.map((order) => (
+                    <div key={order._id} className="flex flex-col sm:flex-row items-center gap-6 bg-white/10 border border-white/10 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300">
+                      {/* Product Image */}
+                      <div className="flex-shrink-0">
+                        {order.product?.images?.[0] ? (
+                          <img
+                            src={order.product.images[0]}
+                            alt={order.product.title}
+                            className="w-20 h-20 rounded-xl object-cover border-4 border-purple-400 shadow"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">?</div>
+                        )}
+                      </div>
+
+                      {/* Details */}
+                      <div className="flex-1 w-full text-center sm:text-left">
+                        <div className="font-bold text-lg text-purple-100 mb-1">{order.product?.title || "N/A"}</div>
+                        <div className="text-purple-200 text-sm mb-1">Buyer: {order.buyer?.name || "N/A"} ({order.buyer?.email})</div>
+                        <div className="text-purple-300 text-xs">
+                          Points Used: {order.points} | Status: {order.status}
+                        </div>
+                        <div className="text-purple-400 text-xs mt-1">
+                          Purchased At: {new Date(order.purchaseDate).toLocaleString()}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-col gap-3 w-full sm:w-auto sm:items-end">
+                        <button className="px-6 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow hover:from-purple-600 hover:to-pink-600 transition-all duration-300">
+                          View
+                        </button>
+                        <button className="px-6 py-2 rounded-xl bg-white/10 text-purple-200 font-semibold border border-white/20 shadow hover:bg-white/20 transition-all duration-300">
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
+
 
           {/* Placeholder for other tabs */}
           {activeTab !== "users" && activeTab !== "listings" && (

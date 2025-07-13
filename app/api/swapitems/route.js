@@ -1,6 +1,5 @@
 import dbConnect from "@/lib/db";
 import SwapItem from "@/model/swapItem_model";
-import Product from "@/model/product_model";
 import User from "@/model/user_model";
 
 export async function POST(request) {
@@ -18,7 +17,7 @@ export async function POST(request) {
     await dbConnect();
 
     const swaps = await SwapItem.find({
-      owner1: userId,
+      $or: [{ owner1: userId }, { owner2: userId }],
       status: "accepted",
     })
       .populate({
@@ -34,25 +33,31 @@ export async function POST(request) {
     const results = [];
 
     for (const swap of swaps) {
-      console.log("swap owener id", swap.owner2);
-      const owner2User = await User.findOne({ clerkUserId: swap.owner2 })
+      const isOwner1 = swap.owner1 === userId;
+
+      const myProduct = isOwner1 ? swap.product1 : swap.product2;
+      const otherProduct = isOwner1 ? swap.product2 : swap.product1;
+
+      const otherUserId = isOwner1 ? swap.owner2 : swap.owner1;
+
+      const otherUser = await User.findOne({ clerkUserId: otherUserId })
         .select("name")
         .lean();
-      console.log("owner to user", owner2User);
+
       results.push({
         _id: swap._id,
         status: swap.status,
         pointDifference: swap.pointDifference,
         swapDate: swap.swapDate,
-        product1: {
-          title: swap.product1?.title || "N/A",
-          image: swap.product1?.images?.[0] || "",
+        myProduct: {
+          title: myProduct?.title || "N/A",
+          image: myProduct?.images?.[0] || "",
         },
-        product2: {
-          title: swap.product2?.title || "N/A",
-          image: swap.product2?.images?.[0] || "",
+        otherProduct: {
+          title: otherProduct?.title || "N/A",
+          image: otherProduct?.images?.[0] || "",
         },
-        owner2Name: owner2User?.name || "Unknown",
+        otherUserName: otherUser?.name || "Unknown",
       });
     }
 

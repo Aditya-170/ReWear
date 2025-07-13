@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUser } from "@clerk/nextjs";
-
+import { useUserProducts } from '@/app/context/UserProductsContext';
 
 export default function ProfilePage() {
   const { user } = useUser();
@@ -12,46 +12,43 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState([]);
   const [purchases, setPurchases] = useState([]);
-
-
+  const { products, userProfile } = useUserProducts();
 
   useEffect(() => {
     if (!user) return;
     const fetchUserProducts = async () => {
-  try {
-    const res = await fetch("/api/products/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        clerkUserId: user.id,
-      }),
-    });
+      try {
+        const res = await fetch("/api/products/user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            clerkUserId: user.id,
+          }),
+        });
 
-    const data = await res.json();
-    setListings(data);
-  } catch (err) {
-    console.error("Error loading listings:", err);
-  }
-};
-  const fetchUserPurchases = async () => {
-  try {
-    const res = await fetch("/api/purchases/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ clerkUserId: user.id }),
-    });
+        const data = await res.json();
+        setListings(data);
+      } catch (err) {
+        console.error("Error loading listings:", err);
+      }
+    };
+    const fetchUserPurchases = async () => {
+      try {
+        const res = await fetch("/api/view-purchase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: userProfile._id }),
+        });
 
-    const data = await res.json();
-    setPurchases(data);
-  } catch (err) {
-    console.error("Error loading purchases:", err);
-  }
-};
-
+        const data = await res.json();
+        setPurchases(data);
+      } catch (err) {
+        console.error("Error loading purchases:", err);
+      }
+    };
+    console.log("purchases", purchases);
     const fetchOrCreateProfile = async () => {
       try {
         const res = await fetch("/api/profile", {
@@ -78,7 +75,7 @@ export default function ProfilePage() {
     fetchUserPurchases();
     fetchUserProducts();
     fetchOrCreateProfile();
-  }, [user]);
+  }, [user , userProfile?._id]);
 
   if (loading || !user || !profile) {
     return (
@@ -129,7 +126,7 @@ export default function ProfilePage() {
           <div className="flex overflow-x-auto gap-4 pb-4 custom-scrollbar">
             {listings.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="min-w-[160px] bg-[#1f012f] rounded-lg shadow-md border border-purple-700 p-3 hover:scale-105 transition-transform"
               >
                 <img
@@ -149,11 +146,11 @@ export default function ProfilePage() {
           <div className="flex overflow-x-auto gap-4 pb-4 custom-scrollbar">
             {purchases.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="min-w-[160px] bg-[#1f012f] rounded-lg shadow-md border border-purple-700 p-3 hover:scale-105 transition-transform"
               >
                 <img
-                  src={item.image}
+                  src={item.images[0]|| "/img4.png"}
                   alt={item.title}
                   className="w-full h-32 object-cover rounded-md mb-2"
                 />
