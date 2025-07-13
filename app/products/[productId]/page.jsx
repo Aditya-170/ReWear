@@ -8,7 +8,8 @@ import { useUserProducts } from '@/app/context/UserProductsContext';
 const ProductDetail = () => {
   const params = useParams();
   const { productId } = params;
-  const { products } = useUserProducts();
+  const { products, userProfile } = useUserProducts();
+  console.log("userPorfile", userProfile);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -73,6 +74,56 @@ const ProductDetail = () => {
     } catch (err) {
       console.error(err);
       alert("An error occurred while submitting the swap.");
+    }
+  };
+
+  const handlePurchaseClick = async () => {
+    if (!product || !userProfile) return;
+
+    const userPoints = userProfile.points || 0;
+    const productPoints = product.point || 0;
+
+    if (userPoints < productPoints) {
+      alert(`You need ${productPoints - userPoints} more points to purchase this item.`);
+      return;
+    }
+
+    try {
+      const res1 = await fetch('/api/create-puchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userProfile._id,
+          productId: product._id,
+          points: productPoints,
+        }),
+      });
+      const data1 = await res1.json();
+
+      if (!res1.ok) {
+        alert("Purchase failed: " + (data1?.message || "Unknown error"));
+        return;
+      }
+      // Deduct Points Using Clerk ID
+      const res2 = await fetch('/api/updateUserPoints', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userProfile.clerkUserId,
+          pointsToDeduct: productPoints,
+        }),
+      });
+      const data2 = await res2.json();
+
+      if (!res2.ok) {
+        alert("Points deduction failed: " + (data2?.message || "Unknown error"));
+        return;
+      }
+      alert(`Purchase successful! You used ${productPoints} points.`);
+
+    } catch (err) {
+      console.error("Purchase error:", err);
+      alert("An error occurred while processing your purchase.");
     }
   };
 
@@ -153,6 +204,7 @@ const ProductDetail = () => {
                   Swap
                 </button>
                 <button
+                  onClick={handlePurchaseClick}
                   className="w-full sm:w-1/2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-extrabold text-lg py-3 rounded-xl shadow-lg hover:shadow-green-500/40 transition-all"
                 >
                   Purchase

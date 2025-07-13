@@ -9,8 +9,9 @@ export default function SwapsPage() {
     const [swaps, setSwaps] = useState([]);
     const [loading, setLoading] = useState(true);
     const { user } = useUser();
+    if (!user) return;
     const userId = user.id;
-    if (!userId) return;
+    // if (!userId) return;
     useEffect(() => {
         const fetchSwaps = async () => {
             try {
@@ -60,29 +61,29 @@ export default function SwapsPage() {
                                         </p>
                                         <p className="text-white text-sm">
                                             You swapped with{" "}
-                                            <span className="text-purple-300">{swap.owner2Name}</span>
+                                            <span className="text-purple-300">{swap.otherUserName}</span>
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-4 flex-wrap justify-center">
                                         <div className="text-center">
                                             <img
-                                                src={swap.product1.image || "/placeholder.png"}
-                                                alt={swap.product1.title}
+                                                src={swap.myProduct.image || "/placeholder.png"}
+                                                alt={swap.myProduct.title}
                                                 className="w-24 h-24 object-cover rounded-md border border-pink-400"
                                             />
                                             <p className="text-xs mt-1 text-white">
-                                                {swap.product1.title}
+                                                {swap.myProduct.title}
                                             </p>
                                         </div>
                                         <p className="text-xl font-bold text-pink-300">⇄</p>
                                         <div className="text-center">
                                             <img
-                                                src={swap.product2.image || "/placeholder.png"}
-                                                alt={swap.product2.title}
+                                                src={swap.otherProduct.image || "/placeholder.png"}
+                                                alt={swap.otherProduct.title}
                                                 className="w-24 h-24 object-cover rounded-md border border-pink-400"
                                             />
                                             <p className="text-xs mt-1 text-white">
-                                                {swap.product2.title}
+                                                {swap.otherProduct.title}
                                             </p>
                                         </div>
                                     </div>
