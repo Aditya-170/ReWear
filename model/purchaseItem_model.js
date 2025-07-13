@@ -9,7 +9,7 @@ const purchaseItemSchema = new mongoose.Schema(
     },
     product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Item",
+      ref: "Product",
       required: true,
     },
     points: {

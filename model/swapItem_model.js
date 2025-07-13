@@ -9,7 +9,7 @@ const swapItemSchema = new mongoose.Schema(
     },
     product1: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Item",
+      ref: "Product",
       required: true,
     },
     owner2: {
@@ -19,7 +19,7 @@ const swapItemSchema = new mongoose.Schema(
     },
     product2: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Item",
+      ref: "Product",
       required: true,
     },
     pointDifference: {
