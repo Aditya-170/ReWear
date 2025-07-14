@@ -7,6 +7,7 @@ const tabs = [
   { label: "Manage Users", value: "users" },
   { label: "Manage Orders", value: "orders" },
   { label: "Manage Listings", value: "listings" },
+  { label: "Manage Issues", value: "issues" },
 ];
 
 export default function AdminPanel() {
@@ -19,6 +20,10 @@ export default function AdminPanel() {
   const [productsVisibleCount, setProductsVisibleCount] = useState(8);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [contacts, setContacts] = useState([]);
+  const [contactsLoading, setContactsLoading] = useState(true);
+
+
 
   useEffect(() => {
     // Fetch users
@@ -38,8 +43,33 @@ export default function AdminPanel() {
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .finally(() => setOrdersLoading(false));
+    setContactsLoading(true);
+    fetch("/api/contact/view")
+      .then((res) => res.json())
+      .then((data) => setContacts(data.contacts || []))
+      .finally(() => setContactsLoading(false));
   }, []);
   console.log("products", products);
+  const handleMarkAsRead = async (contactId) => {
+    try {
+      const res = await fetch("/api/contact/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contactId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setContacts((prev) =>
+          prev.map((c) => (c._id === contactId ? { ...c, status: "Read" } : c))
+        );
+      } else {
+        alert("Failed to update status: " + data.message);
+      }
+    } catch (err) {
+      alert("Error marking as read.");
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -223,6 +253,62 @@ export default function AdminPanel() {
                       </div>
                     </div>
                   ))}
+                </>
+              )}
+            </div>
+          )}
+          {activeTab === "issues" && (
+            <div className="space-y-6">
+              {contactsLoading ? (
+                <div className="text-center py-12 text-purple-200 animate-pulse">Loading issues...</div>
+              ) : contacts.length === 0 ? (
+                <div className="text-center py-12 text-purple-200">No issues found.</div>
+              ) : (
+                <>
+                  {contacts
+                    .sort((a, b) => {
+                      if (a.status === "Unread" && b.status === "Read") return -1;
+                      if (a.status === "Read" && b.status === "Unread") return 1;
+                      return new Date(b.createdAt) - new Date(a.createdAt);
+                    })
+                    .map((contact) => (
+                      <div
+                        key={contact._id}
+                        className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white/10 border border-white/10 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 ${contact.status === "Unread" ? "border-pink-500/60" : ""
+                          }`}
+                      >
+                        <div className="flex-1 text-left">
+                          <div className="font-bold text-lg text-purple-100 mb-1">{contact.title}</div>
+                          <div className="text-purple-300 text-sm mb-2 whitespace-pre-wrap">{contact.description}</div>
+                          <div className="text-purple-200 text-xs">Name: {contact.name}</div>
+                          <div className="text-purple-200 text-xs">Email: {contact.email}</div>
+                          <div className="text-purple-200 text-xs">Phone: {contact.phone}</div>
+                          <div className="text-purple-400 text-xs mt-1">
+                            Submitted: {new Date(contact.createdAt).toLocaleString()}
+                          </div>
+                          <div className="mt-2">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${contact.status === "Unread"
+                                ? "bg-pink-500/90 text-white"
+                                : "bg-green-600/80 text-white"
+                                }`}
+                            >
+                              {contact.status}
+                            </span>
+                          </div>
+                        </div>
+                        {contact.status === "Unread" && (
+                          <div className="flex-shrink-0">
+                            <button
+                              onClick={() => handleMarkAsRead(contact._id)}
+                              className="px-5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow hover:from-pink-600 hover:to-purple-700 transition-all duration-300"
+                            >
+                              Mark as Read
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                 </>
               )}
             </div>

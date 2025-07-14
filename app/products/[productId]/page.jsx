@@ -119,6 +119,17 @@ const ProductDetail = () => {
         alert("Points deduction failed: " + (data2?.message || "Unknown error"));
         return;
       }
+      const res3 = await fetch('/api/update-product-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: product._id }),
+      });
+      const data3 = await res3.json();
+
+      if (!res3.ok) {
+        alert("Product status update failed: " + (data3?.message || "Unknown error"));
+        return;
+      }
       alert(`Purchase successful! You used ${productPoints} points.`);
 
     } catch (err) {
@@ -199,16 +210,27 @@ const ProductDetail = () => {
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={handleSwapClick}
-                  className="w-full sm:w-1/2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-extrabold text-lg py-3 rounded-xl shadow-lg hover:shadow-purple-500/40 transition-all"
+                  disabled={product.status !== 'Available'}
+                  className={`w-full sm:w-1/2 text-white font-extrabold text-lg py-3 rounded-xl shadow-lg transition-all
+    ${product.status !== 'Available'
+                      ? 'bg-pink-500 cursor-not-allowed opacity-60'
+                      : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 hover:shadow-purple-500/40'}
+  `}
                 >
                   Swap
                 </button>
                 <button
                   onClick={handlePurchaseClick}
-                  className="w-full sm:w-1/2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-extrabold text-lg py-3 rounded-xl shadow-lg hover:shadow-green-500/40 transition-all"
+                  disabled={product.status !== 'Available'}
+                  className={`w-full sm:w-1/2 text-white font-extrabold text-lg py-3 rounded-xl shadow-lg transition-all
+    ${product.status !== 'Available'
+                      ? 'bg-pink-500 cursor-not-allowed opacity-60'
+                      : 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 hover:shadow-green-500/40'}
+  `}
                 >
                   Purchase
                 </button>
+
               </div>
             </div>
           </div>
