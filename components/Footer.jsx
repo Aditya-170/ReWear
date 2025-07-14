@@ -33,9 +33,9 @@ export default function Footer() {
           <div className="min-w-[150px]">
             <h4 className="text-purple-200 font-semibold mb-4">Quick Links</h4>
             <div className="space-y-2">
-              <a href="#" className="block text-purple-300 hover:text-purple-200 transition-colors">Browse Items</a>
-              <a href="#" className="block text-purple-300 hover:text-purple-200 transition-colors">List Item</a>
-              <a href="#" className="block text-purple-300 hover:text-purple-200 transition-colors">My Account</a>
+              <a href="/products" className="block text-purple-300 hover:text-purple-200 transition-colors">Browse Items</a>
+              <a href="/purchased" className="block text-purple-300 hover:text-purple-200 transition-colors">List Item</a>
+              <a href="/profile" className="block text-purple-300 hover:text-purple-200 transition-colors">My Account</a>
             </div>
           </div>
 
@@ -43,8 +43,8 @@ export default function Footer() {
           <div className="min-w-[150px]">
             <h4 className="text-purple-200 font-semibold mb-4">Support</h4>
             <div className="space-y-2">
-              <a href="#" className="block text-purple-300 hover:text-purple-200 transition-colors">Help Center</a>
-              <a href="#" className="block text-purple-300 hover:text-purple-200 transition-colors">Contact Us</a>
+              <a href="contact" className="block text-purple-300 hover:text-purple-200 transition-colors">Help Center</a>
+              <a href="contact" className="block text-purple-300 hover:text-purple-200 transition-colors">Contact Us</a>
               <a href="#" className="block text-purple-300 hover:text-purple-200 transition-colors">Terms of Service</a>
             </div>
           </div>
@@ -58,9 +58,9 @@ export default function Footer() {
               <a href="#" className="text-purple-300 hover:text-purple-200"><Facebook className="w-5 h-5" /></a>
             </div>
             <div className="space-y-2">
-              <a href="#" className="block text-purple-300 hover:text-purple-200">Twitter</a>
-              <a href="#" className="block text-purple-300 hover:text-purple-200">Instagram</a>
-              <a href="#" className="block text-purple-300 hover:text-purple-200">Facebook</a>
+              <a href="https://twitter.com" className="block text-purple-300 hover:text-purple-200">Twitter</a>
+              <a href="https://instagram.com" className="block text-purple-300 hover:text-purple-200">Instagram</a>
+              <a href="https://facebook.com" className="block text-purple-300 hover:text-purple-200">Facebook</a>
             </div>
           </div>
         </div>
