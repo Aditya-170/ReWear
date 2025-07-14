@@ -8,6 +8,7 @@ import Leaderboard from '@/components/Leaderboard';
 const ImageCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
+
   const carouselImages = [
     {
       id: 1,
@@ -132,44 +133,26 @@ const ImageCarousel = () => {
   );
 };
 
+
+
 const LandingPage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const featuredItems = [
-    {
-      id: 1,
-      title: "Vintage Denim Jacket",
-      condition: "Excellent condition",
-      points: "150 points",
-      category: "Jackets",
-      emoji: "🧥"
-    },
-    {
-      id: 2,
-      title: "Black Evening Dress",
-      condition: "Like new",
-      points: "200 points",
-      category: "Dresses",
-      emoji: "👗"
-    },
-    {
-      id: 3,
-      title: "Designer Sneakers",
-      condition: "Good condition",
-      points: "120 points",
-      category: "Shoes",
-      emoji: "👟"
-    },
-    {
-      id: 4,
-      title: "Cozy Knit Sweater",
-      condition: "Excellent condition",
-      points: "80 points",
-      category: "Sweaters",
-      emoji: "🧶"
-    }
-  ];
+  const [featuredItems, setFeaturedItems] = useState([]);
 
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const res = await fetch("/api/products/featured");
+        const data = await res.json();
+        setFeaturedItems(data);
+      } catch (err) {
+        console.error("Error loading featured items:", err);
+      }
+    };
+
+    fetchFeatured();
+  }, []);
   const categories = [
     { name: "T-Shirt", icon: "👕", count: "2.5K+", color: "from-purple-500 to-pink-500" },
     { name: "Shirt", icon: "👔", count: "3.2K+", color: "from-purple-500 to-blue-500" },
@@ -218,9 +201,14 @@ const LandingPage = () => {
               </span>
             </div>
 
-            <h1 className="text-7xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">
-              ReWear
+            <h1 className="text-7xl md:text-8xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300">
+              <span className="inline-block animate-bounce bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">
+                Re
+              </span>
+              Wear
             </h1>
+
+
 
             <p className="text-xl mb-12 max-w-3xl mx-auto text-purple-200 leading-relaxed">
               Join the sustainable fashion revolution. Exchange, swap, and discover pre-loved clothing while reducing textile waste and building a greener future.
@@ -340,38 +328,57 @@ const LandingPage = () => {
       </section>
 
       {/* Featured Items Section */}
-      <section className="px-4 py-20 bg-black/60 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-purple-200 mb-4">Featured Items</h2>
-            <p className="text-purple-300 text-lg">Handpicked sustainable fashion finds</p>
-          </div>
+       <section className="px-4 py-20 bg-black/60 backdrop-blur-sm">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-purple-200 mb-4">Featured Items</h2>
+          <p className="text-purple-300 text-lg">Handpicked sustainable fashion finds</p>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredItems.map((item, index) => (
-              <div key={item.id} className="group cursor-pointer">
-                <div className="bg-purple-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl overflow-hidden hover:bg-purple-900/30 transition-all duration-300 transform hover:scale-105">
-                  <div className="aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="text-6xl relative z-10">{item.emoji}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featuredItems.map((item) => (
+            <Link key={item._id} href={`/products/${item._id}`} className="group cursor-pointer">
+              <div className="bg-purple-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl overflow-hidden transform transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-pink-500/20">
+                <div className="aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="text-6xl relative z-10 w-full h-full flex items-center justify-center">
+                    {item.images?.[0] ? (
+                      <img
+                        src={item.images[0]}
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                    ) : (
+                      <span>🧵</span>
+                    )}
                   </div>
-                  <div className="p-6">
-                    <h3 className="font-semibold text-purple-200 mb-2">{item.title}</h3>
-                    <p className="text-sm text-purple-300 mb-3">{item.condition}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-purple-400 font-semibold">{item.points}</span>
-                      <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-sm font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center space-x-1">
-                        <Heart className="w-4 h-4" />
-                        <span>Save</span>
-                      </button>
-                    </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="font-semibold text-purple-200 mb-2">{item.title}</h3>
+                  <p className="text-sm text-purple-300 mb-3">{item.condition || "Good condition"}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-purple-400 font-semibold">{item.points} points</span>
+                    <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-sm font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center space-x-1">
+                      <Heart className="w-4 h-4" />
+                      <span>Save</span>
+                    </button>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </Link>
+          ))}
         </div>
-      </section>
+
+        {/* More Button */}
+        <div className="text-center mt-12">
+          <Link href="/products">
+            <button className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-purple-600 hover:to-pink-600 font-semibold transition-all">
+              View More Items
+            </button>
+          </Link>
+        </div>
+      </div>
+    </section>
 
       {/* Impact Section */}
       <section className="px-4 py-20">

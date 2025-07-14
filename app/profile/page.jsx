@@ -5,15 +5,35 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUser } from "@clerk/nextjs";
 import { useUserProducts } from '@/app/context/UserProductsContext';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  BarChart, Bar, PieChart, Pie, Cell,
+  ScatterChart,
+  Scatter
+} from "recharts";
+
 
 export default function ProfilePage() {
   const { user } = useUser();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState([]);
-  const [purchases, setPurchases] = useState([]);
   const { products, userProfile } = useUserProducts();
-  console.log("user", user);
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      const res = await fetch("/api/user-analytics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clerkUserId: user.id }),
+      });
+      const data = await res.json();
+      setChartData(data);
+    };
+    if (user?.id) fetchAnalytics();
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
     const fetchUserProducts = async () => {
@@ -34,21 +54,8 @@ export default function ProfilePage() {
         console.error("Error loading listings:", err);
       }
     };
-    const fetchUserPurchases = async () => {
-      try {
-        const res = await fetch("/api/view-purchase", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: userProfile._id }),
-        });
 
-        const data = await res.json();
-        setPurchases(data);
-      } catch (err) {
-        console.error("Error loading purchases:", err);
-      }
-    };
-    console.log("purchases", purchases);
+
     const fetchOrCreateProfile = async () => {
       try {
         const res = await fetch("/api/profile", {
@@ -72,7 +79,7 @@ export default function ProfilePage() {
         setLoading(false);
       }
     };
-    fetchUserPurchases();
+
     fetchUserProducts();
     fetchOrCreateProfile();
   }, [user, userProfile?._id]);
@@ -140,25 +147,116 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Purchases */}
-        <div className="max-w-6xl mx-auto mb-16">
-          <h3 className="text-2xl font-bold mb-4 text-pink-400">My Purchases</h3>
-          <div className="flex overflow-x-auto gap-4 pb-4 custom-scrollbar">
-            {purchases.map((item) => (
-              <div
-                key={item._id}
-                className="min-w-[160px] bg-[#1f012f] rounded-lg shadow-md border border-purple-700 p-3 hover:scale-105 transition-transform"
-              >
-                <img
-                  src={item.images[0] || "/img4.png"}
-                  alt={item.title}
-                  className="w-full h-32 object-cover rounded-md mb-2"
-                />
-                <p className="text-sm font-medium text-center text-white truncate">{item.title}</p>
-              </div>
-            ))}
+        {/* Analytics Charts */}
+        <h3 className="text-2xl font-bold text-purple-300 mb-6 text-center">Monthly Swaps & Purchases</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 🟣 Swaps Line Chart */}
+          <div className="bg-[#1f012f] p-4 rounded-xl border border-purple-700 shadow-md">
+            <h4 className="text-lg font-semibold text-purple-300 mb-2 text-center">Swaps Trend</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#5B21B6" />
+                <XAxis dataKey="month" stroke="#D8B4FE" />
+                <YAxis stroke="#D8B4FE" />
+                <Tooltip />
+                <Line type="monotone" dataKey="swaps" stroke="#A78BFA" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* 🩷 Purchases Bar Chart */}
+          <div className="bg-[#1f012f] p-4 rounded-xl border border-purple-700 shadow-md">
+            <h4 className="text-lg font-semibold text-purple-300 mb-2 text-center">Purchases Trend</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#5B21B6" />
+                <XAxis dataKey="month" stroke="#D8B4FE" />
+                <YAxis stroke="#D8B4FE" />
+                <Tooltip />
+                <Bar dataKey="purchases" fill="#F472B6" barSize={40} radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
+
+
+        <h3 className="text-2xl font-bold text-purple-300 mt-12 mb-6 text-center">
+          Activity Breakdown
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 🔵 Scatter Chart: Points Earned per Month */}
+          <div className="bg-[#1f012f] p-4 rounded-xl border border-purple-700 shadow-md">
+            <h4 className="text-lg font-semibold text-purple-300 mb-2 text-center">
+              Points Used Per Month
+            </h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <ScatterChart>
+                <CartesianGrid strokeDasharray="3 3" stroke="#5B21B6" />
+                <XAxis
+                  type="category"
+                  dataKey="month"
+                  name="Month"
+                  stroke="#D8B4FE"
+                />
+                <YAxis
+                  type="number"
+                  dataKey="points"
+                  name="Points"
+                  stroke="#D8B4FE"
+                />
+                <Tooltip />
+                <Scatter
+                  name="Points"
+                  data={chartData}
+                  fill="#C084FC"
+                  line
+                  shape="circle"
+                />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* 🟣 Pie Chart: Swaps vs Listings vs Purchases */}
+          <div className="bg-[#1f012f] p-4 rounded-xl border border-purple-700 shadow-md">
+            <h4 className="text-lg font-semibold text-purple-300 mb-2 text-center">
+              Swaps vs Listings vs Purchases
+            </h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={[
+                    {
+                      name: "Swaps",
+                      value: chartData.reduce((acc, d) => acc + d.swaps, 0),
+                    },
+                    {
+                      name: "Listings",
+                      value: chartData.reduce((acc, d) => acc + d.listings, 0),
+                    },
+                    {
+                      name: "Purchases",
+                      value: chartData.reduce((acc, d) => acc + d.purchases, 0),
+                    },
+                  ]}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={90}
+                  label
+                >
+                  <Cell fill="#A78BFA" />
+                  <Cell fill="#F472B6" />
+                  <Cell fill="#C084FC" />
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+
       </div>
 
       <Footer />

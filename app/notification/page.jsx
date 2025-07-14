@@ -1,22 +1,23 @@
-// ✅ Updated Frontend Notification Page
-
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle, AlertCircle, Clock, XCircle } from "lucide-react";
+import { CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState("swap"); // swap | status
+  const [loading, setLoading] = useState(true);
   const { user } = useUser();
 
   const fetchNotifications = async () => {
     if (!user?.id) return;
 
     try {
+      setLoading(true);
       const res = await fetch("/api/notifications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -27,6 +28,9 @@ export default function NotificationsPage() {
       setNotifications(data);
     } catch (err) {
       console.error("Error fetching notifications:", err);
+      toast.error("Failed to fetch notifications");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,9 +42,15 @@ export default function NotificationsPage() {
         body: JSON.stringify({ notificationId, swapId }),
       });
 
-      if (res.ok) fetchNotifications();
+      if (res.ok) {
+        toast.success("Swap accepted successfully!");
+        fetchNotifications();
+      } else {
+        toast.error("Failed to accept swap");
+      }
     } catch (err) {
       console.error("Error accepting notification:", err);
+      toast.error("Error accepting swap");
     }
   };
 
@@ -52,14 +62,28 @@ export default function NotificationsPage() {
         body: JSON.stringify({ notificationId, swapId }),
       });
 
-      if (res.ok) fetchNotifications();
+      if (res.ok) {
+        toast.success("Swap rejected");
+        fetchNotifications();
+      } else {
+        toast.error("Failed to reject swap");
+      }
     } catch (err) {
       console.error("Error rejecting notification:", err);
+      toast.error("Error rejecting swap");
     }
   };
 
   useEffect(() => {
+    if (!user?.id) return;
+
     fetchNotifications();
+
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, [user]);
 
   const swapNotifications = notifications.filter((n) => n.status === "pending");
@@ -102,7 +126,9 @@ export default function NotificationsPage() {
 
   return (
     <>
+      <ToastContainer position="top-center " autoClose={3000} />
       <Navbar />
+
       <div className="min-h-screen bg-black/90 text-white py-16 px-4 mt-5">
         <div className="max-w-3xl mx-auto bg-[#1a1a1a] p-8 border border-purple-500/20 rounded-xl shadow-lg">
           <h2 className="text-3xl font-bold text-purple-200 mb-6 text-center">Your Notifications</h2>
@@ -130,7 +156,9 @@ export default function NotificationsPage() {
             </button>
           </div>
 
-          {notifications.length === 0 ? (
+          {loading ? (
+            <p className="text-center text-purple-300">Refreshing...</p>
+          ) : notifications.length === 0 ? (
             <p className="text-purple-400 text-center">No notifications yet.</p>
           ) : (
             <ul className="space-y-4">
@@ -139,6 +167,7 @@ export default function NotificationsPage() {
           )}
         </div>
       </div>
+
       <Footer />
     </>
   );

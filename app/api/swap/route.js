@@ -40,7 +40,7 @@ export async function POST(request) {
 
     // 🔔 Create Notification for owner2
     const userToNotify = await user_model.findOne({ clerkUserId: owner2 });
-
+  
     if (userToNotify) {
       await Notification.create({
         user: userToNotify._id,
@@ -49,6 +49,9 @@ export async function POST(request) {
         status: "pending",
       });
     }
+    // Update user swap counts
+    await user_model.updateOne({ clerkUserId: owner1 }, { $inc: { numberOfSwaps: 1 } });
+    await user_model.updateOne({ clerkUserId: owner2 }, { $inc: { numberOfSwaps: 1 } });
 
     return new Response(JSON.stringify({ success: true, swap: newSwap }), {
       status: 201,
