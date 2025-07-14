@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ChevronLeft, ChevronRight, Star, Users, Package, Recycle, Search, Heart, Sparkles, TrendingUp, Shield, Leaf } from 'lucide-react';
 import Link from 'next/link';
-
+import Leaderboard from '@/components/Leaderboard';
 const ImageCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -122,8 +122,8 @@ const ImageCarousel = () => {
             key={index}
             onClick={() => goToSlide(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide
-                ? 'bg-purple-300 scale-125'
-                : 'bg-purple-400/50 hover:bg-purple-300/70'
+              ? 'bg-purple-300 scale-125'
+              : 'bg-purple-400/50 hover:bg-purple-300/70'
               }`}
           />
         ))}
@@ -209,23 +209,6 @@ const LandingPage = () => {
 
         <div className="relative max-w-6xl mx-auto">
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto mb-16">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative bg-black/60 backdrop-blur-xl border border-purple-500/30 rounded-full p-1">
-                <div className="flex items-center">
-                  <input
-                    type="text"
-                    placeholder="Search for sustainable fashion items..."
-                    className="flex-1 px-6 py-4 bg-transparent text-purple-200 placeholder-purple-400 focus:outline-none"
-                  />
-                  <button className="mr-2 p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300">
-                    <Search className="w-5 h-5 text-white" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Hero Content */}
           <div className="text-center text-purple-100 mb-16">
@@ -307,6 +290,8 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      <Leaderboard />
 
       {/* Image Carousel Section */}
       <section className="px-4 py-20 bg-black/60 backdrop-blur-sm">
