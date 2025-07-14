@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
+import Image from "next/image";
 
 async function uploadToCloudinary(file) {
   const formData = new FormData();
@@ -107,8 +108,8 @@ const AddProduct = () => {
               </label>
               {imageFiles.length > 0 ? (
                 <div className="relative group">
-                  <img
-                    src={URL.createObjectURL(imageFiles[0])}
+                  <Image
+                    src={URL.createObjectURL(imageFiles[0]) || "/img.png"}
                     alt="Main preview"
                     className="w-full h-64 object-cover rounded-2xl border-4 border-purple-400 shadow-xl mb-2"
                   />
@@ -117,9 +118,7 @@ const AddProduct = () => {
                     className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold shadow-lg hover:bg-red-600 transition-all duration-200 z-10"
                     type="button"
                     title="Remove main image"
-                  >
-                    ×
-                  </button>
+                  ></button>
                 </div>
               ) : (
                 <div
@@ -169,8 +168,8 @@ const AddProduct = () => {
                 <div className="grid grid-cols-4 gap-3">
                   {imageFiles.slice(1).map((file, idx) => (
                     <div key={idx + 1} className="relative group">
-                      <img
-                        src={URL.createObjectURL(file)}
+                      <Image
+                        src={URL.createObjectURL(file) || "/img4.png"}
                         alt="preview"
                         className="w-full h-20 object-cover rounded-lg border-2 border-purple-400 shadow"
                       />
