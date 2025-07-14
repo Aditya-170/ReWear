@@ -171,12 +171,12 @@ const LandingPage = () => {
   ];
 
   const categories = [
-    { name: "Dresses", icon: "👗", count: "2.5K+", color: "from-purple-500 to-pink-500" },
-    { name: "Tops", icon: "👕", count: "3.2K+", color: "from-purple-500 to-blue-500" },
-    { name: "Bottoms", icon: "👖", count: "1.8K+", color: "from-purple-500 to-indigo-500" },
+    { name: "T-Shirt", icon: "👕", count: "2.5K+", color: "from-purple-500 to-pink-500" },
+    { name: "Shirt", icon: "👔", count: "3.2K+", color: "from-purple-500 to-blue-500" },
+    { name: "Pant", icon: "👖", count: "1.8K+", color: "from-purple-500 to-indigo-500" },
     { name: "Shoes", icon: "👟", count: "2.1K+", color: "from-purple-500 to-violet-500" },
-    { name: "Accessories", icon: "👜", count: "1.5K+", color: "from-purple-500 to-fuchsia-500" },
-    { name: "Jackets", icon: "🧥", count: "900+", color: "from-purple-500 to-pink-500" }
+    { name: "phone", icon: "📱", count: "1.5K+", color: "from-purple-500 to-fuchsia-500" },
+    { name: "Jacket", icon: "🧥", count: "900+", color: "from-purple-500 to-pink-500" }
   ];
 
   useEffect(() => {
@@ -315,17 +315,26 @@ const LandingPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category, index) => (
-              <div key={index} className="group cursor-pointer">
+              <Link
+                key={index}
+                href={`/products?category=${encodeURIComponent(category.name)}`}
+                className="group cursor-pointer"
+              >
                 <div className="relative p-8 bg-purple-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl hover:bg-purple-900/30 transition-all duration-300 transform hover:scale-105">
-                  <div className={`absolute inset-0 bg-gradient-to-r ${category.color} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}></div>
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-r ${category.color} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}
+                  ></div>
                   <div className="relative text-center">
                     <div className="text-5xl mb-4">{category.icon}</div>
-                    <h3 className="text-xl font-semibold text-purple-200 mb-2">{category.name}</h3>
+                    <h3 className="text-xl font-semibold text-purple-200 mb-2">
+                      {category.name}
+                    </h3>
                     <p className="text-purple-300">{category.count} items</p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
+
           </div>
         </div>
       </section>

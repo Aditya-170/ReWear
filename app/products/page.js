@@ -3,12 +3,15 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { useSearchParams } from "next/navigation";
 
 export default function ProductsList() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category") || "All";
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [visibleCount, setVisibleCount] = useState(12);
 
   useEffect(() => {
