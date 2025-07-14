@@ -4,12 +4,14 @@ import { useParams } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useUserProducts } from '@/app/context/UserProductsContext';
-
+import { toast } from 'react-toastify';
+import { useRouter } from "next/navigation";
 const ProductDetail = () => {
   const params = useParams();
   const { productId } = params;
   const { products, userProfile } = useUserProducts();
-  console.log("userPorfile", userProfile);
+  const router = useRouter();
+  // console.log("userPorfile", userProfile);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -65,15 +67,16 @@ const ProductDetail = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert("Swap request submitted successfully!");
+        toast.success("Swap request submitted successfully!");
+        router.push("/home")
         setShowSwapList(false);
         setSelectedSwapId(null);
       } else {
-        alert("Failed to submit swap: " + (data?.message || "Unknown error"));
+        toast.error("Failed to submit swap: " + (data?.message || "Unknown error"));
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred while submitting the swap.");
+      toast.error("An error occurred while submitting the swap.");
     }
   };
 
@@ -84,7 +87,7 @@ const ProductDetail = () => {
     const productPoints = product.point || 0;
 
     if (userPoints < productPoints) {
-      alert(`You need ${productPoints - userPoints} more points to purchase this item.`);
+      toast.error(`You need ${productPoints - userPoints} more points to purchase this item.`);
       return;
     }
 
@@ -101,7 +104,7 @@ const ProductDetail = () => {
       const data1 = await res1.json();
 
       if (!res1.ok) {
-        alert("Purchase failed: " + (data1?.message || "Unknown error"));
+        toast.error("Purchase failed: " + (data1?.message || "Unknown error"));
         return;
       }
       // Deduct Points Using Clerk ID
@@ -116,7 +119,7 @@ const ProductDetail = () => {
       const data2 = await res2.json();
 
       if (!res2.ok) {
-        alert("Points deduction failed: " + (data2?.message || "Unknown error"));
+        toast.error("Points deduction failed: " + (data2?.message || "Unknown error"));
         return;
       }
       const res3 = await fetch('/api/update-product-status', {
@@ -127,14 +130,14 @@ const ProductDetail = () => {
       const data3 = await res3.json();
 
       if (!res3.ok) {
-        alert("Product status update failed: " + (data3?.message || "Unknown error"));
+        toast.error("Product status update failed: " + (data3?.message || "Unknown error"));
         return;
       }
-      alert(`Purchase successful! You used ${productPoints} points.`);
-
+      toast.success(`Purchase successful! You used ${productPoints} points.`);
+      router.push("/purchased")
     } catch (err) {
       console.error("Purchase error:", err);
-      alert("An error occurred while processing your purchase.");
+      toast.error("An error occurred while processing your purchase.");
     }
   };
 

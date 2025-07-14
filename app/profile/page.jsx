@@ -13,7 +13,7 @@ export default function ProfilePage() {
   const [listings, setListings] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const { products, userProfile } = useUserProducts();
-
+  console.log("user", user);
   useEffect(() => {
     if (!user) return;
     const fetchUserProducts = async () => {
@@ -75,7 +75,7 @@ export default function ProfilePage() {
     fetchUserPurchases();
     fetchUserProducts();
     fetchOrCreateProfile();
-  }, [user , userProfile?._id]);
+  }, [user, userProfile?._id]);
 
   if (loading || !user || !profile) {
     return (
@@ -150,7 +150,7 @@ export default function ProfilePage() {
                 className="min-w-[160px] bg-[#1f012f] rounded-lg shadow-md border border-purple-700 p-3 hover:scale-105 transition-transform"
               >
                 <img
-                  src={item.images[0]|| "/img4.png"}
+                  src={item.images[0] || "/img4.png"}
                   alt={item.title}
                   className="w-full h-32 object-cover rounded-md mb-2"
                 />
