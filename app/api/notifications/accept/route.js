@@ -46,12 +46,12 @@ export async function POST(req) {
     }
 
     // ✅ Point Adjustment Logic
-    const p1Points = swap.product1.points;
-    const p2Points = swap.product2.points;
+    const p1Points = swap.product1.point;
+    const p2Points = swap.product2.point;
     const pointDiff = Math.abs(p1Points - p2Points);
 
     if (p1Points !== p2Points) {
-      const userToRewardClerkId = p1Points < p2Points ? swap.owner1 : swap.owner2;
+      const userToRewardClerkId = p1Points > p2Points ? swap.owner1 : swap.owner2;
 
       const rewardUser = await User.findOne({ clerkUserId: userToRewardClerkId });
       if (rewardUser) {
