@@ -2,6 +2,7 @@
 import Navbar from "@/components/Navbar";
 import React, { useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { toast } from "react-toastify";
 
 export default function ContactPage() {
   const [title, setTitle] = useState("");
@@ -38,7 +39,7 @@ export default function ContactPage() {
 
       const data = await res.json();
       if (res.ok) {
-        alert("Message sent successfully!");
+        toast.success("Message sent successfully!");
         setTitle("");
         setDescription("");
       } else {
