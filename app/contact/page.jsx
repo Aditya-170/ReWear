@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import React, { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "react-toastify";
-
+import Footer from "@/components/Footer";
 export default function ContactPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -104,6 +104,7 @@ export default function ContactPage() {
           </form>
         </div>
       </div>
+        <Footer/>
     </>
   );
 }
