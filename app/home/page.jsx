@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Star, Users, Package, Recycle, Search, Heart
 import Link from 'next/link';
 import Leaderboard from '@/components/Leaderboard';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 const ImageCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -187,7 +188,7 @@ const LandingPage = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ amount: 0.3 }}
+       viewport={{once: true, amount: 0.1 }}
         className="relative pt-24 pb-16 px-4 overflow-hidden"
       >
         {/* Animated Background Elements */}
@@ -293,7 +294,7 @@ const LandingPage = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ amount: 0.3 }}
+        viewport={{once: true, amount: 0.1 }}
         className="px-4 py-20 bg-black/60 backdrop-blur-sm"
       >
         <div className="max-w-6xl mx-auto">
@@ -311,7 +312,7 @@ const LandingPage = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ amount: 0.3 }}
+        viewport={{once: true, amount: 0.1 }}
         className="px-4 py-20"
       >
         <div className="max-w-6xl mx-auto">
@@ -351,66 +352,75 @@ const LandingPage = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ amount: 0.3 }}
-        className="px-4 py-20 bg-black/60 backdrop-blur-sm"
+        viewport={{once: true, amount: 0.1 }}
+      className="px-4 py-20 bg-black/60 backdrop-blur-sm"
       >
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-purple-200 mb-4">Featured Items</h2>
-            <p className="text-purple-300 text-lg">Handpicked sustainable fashion finds</p>
-          </div>
+      {/* Temporarily replace motion.section with plain section */}
+      {/* <section className="px-4 py-20 bg-black/60 backdrop-blur-sm"> */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredItems.map((item) => (
-              <Link key={item._id} href={`/products/${item._id}`} className="group cursor-pointer">
-                <div className="bg-purple-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl overflow-hidden transform transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-pink-500/20">
-                  <div className="aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="text-6xl relative z-10 w-full h-full flex items-center justify-center">
-                      {item.images?.[0] ? (
-                        <img
-                          src={item.images[0]}
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        />
-                      ) : (
-                        <span>🧵</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-semibold text-purple-200 mb-2">{item.title}</h3>
-                    <p className="text-sm text-purple-300 mb-3">{item.condition || "Good condition"}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-purple-400 font-semibold">{item.points} points</span>
-                      <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-sm font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center space-x-1">
-                        <Heart className="w-4 h-4" />
-                        <span>Save</span>
-                      </button>
-                    </div>
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-purple-200 mb-4">Featured Items</h2>
+          <p className="text-purple-300 text-lg">Handpicked sustainable fashion finds</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
+
+          {featuredItems.map((item) => (
+            <Link key={item._id} href={`/products/${item._id}`} className="group cursor-pointer">
+              <div className="bg-purple-900/20 backdrop-blur-sm border border-purple-500/20 rounded-2xl overflow-hidden transform transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-pink-500/20">
+                <div className="aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                  <div className="relative z-10 w-full h-full">
+                    {item.images?.[0] ? (
+                      <Image
+                        src={item.images[0] || "/img4.png"}
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, 25vw" // optional: responsive loading
+                      />
+                    ) : (
+                      <span className="text-4xl">🧵</span>
+                    )}
                   </div>
                 </div>
-              </Link>
-            ))}
-          </div>
 
-          {/* More Button */}
-          <div className="text-center mt-12">
-            <Link href="/products">
-              <button className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-purple-600 hover:to-pink-600 font-semibold transition-all">
-                View More Items
-              </button>
+                <div className="p-6">
+                  <h3 className="font-semibold text-purple-200 mb-2">{item.title}</h3>
+                  <p className="text-sm text-purple-300 mb-3">{item.condition || "Good condition"}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-purple-400 font-semibold">{item.points} points</span>
+                    <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-sm font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center space-x-1">
+                      <Heart className="w-4 h-4" />
+                      <span>Save</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </Link>
-          </div>
+          ))}
         </div>
-      </motion.section>
 
-      {/* Impact Section */}
+        {/* More Button */}
+        <div className="text-center mt-12">
+          <Link href="/products">
+            <button className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-purple-600 hover:to-pink-600 font-semibold transition-all">
+              View More Items
+            </button>
+          </Link>
+        </div>
+      </div>
+    </motion.section>
+      {/* </section> */ }
+
+  {/* Impact Section */ }
       <motion.section
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ amount: 0.3 }}
+        viewport={{once: true, amount: 0.1 }}
         className="px-4 py-20"
       >
         <div className="max-w-6xl mx-auto">
@@ -454,7 +464,7 @@ const LandingPage = () => {
       </motion.section>
 
       <Footer />
-    </div>
+    </div >
   );
 };
 
