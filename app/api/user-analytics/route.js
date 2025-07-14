@@ -22,7 +22,7 @@ export async function POST(req) {
   }
 
   const swaps = await SwapItem.find({ $or: [{ owner1: clerkUserId }, { owner2: clerkUserId }] });
-  const purchases = await PurchaseItem.find({ owner: uid }).populate("product");
+  const purchases = await PurchaseItem.find({ buyer: uid }).populate("product");
   const listings = await Product.find({ ownerId: clerkUserId });
 
   swaps.forEach((s) => {
